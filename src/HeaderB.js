@@ -19,14 +19,14 @@ function HeaderB(props) {
     
     
 
-        {/*}
+        {/* { 
           <Nav className="ms-auto">
             <Nav.Link as={Link} to="/Home">Home</Nav.Link>
             <Nav.Link as={Link} to="/About">About</Nav.Link>
             <Nav.Link as={Link} to="/Contact">Contact</Nav.Link>
             <Nav.Link as={Link} to="/Login">Login</Nav.Link>
           </Nav>
-          */
+          */ }
     
     </div>
   
