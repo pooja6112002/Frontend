@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-
+import StudentTable from "./StudentTable";  
 import HeaderB from "./HeaderB";
 import Home from "./Home";
 import Login from "./Login";
@@ -37,6 +37,7 @@ function App() {
           <Route path="/Login" element={<Login />} />
           <Route path="/Studentnew" element={<Studentnew />} />
           <Route path="/product" element={<Product />} />
+          <Route path="/student" element={<StudentTable />} />
         </Routes>
       </main>
     </Router>
@@ -45,7 +46,7 @@ function App() {
 
 export default App;
 
-jbbjdbjwe
+
 
 
 

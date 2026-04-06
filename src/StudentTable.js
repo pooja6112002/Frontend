@@ -8,7 +8,8 @@ function Table1() {
   const [show, setShow] = useState(false);
   const [studentList, setStudentList] = useState([]);
   const [isEdit, setIsEdit] = useState(false);
-const[token,setToken]=useState(""); 
+  const [token, setToken] = useState("");
+
   // Separate States
   const [id, setId] = useState("");
   const [name, setName] = useState("");
@@ -16,20 +17,37 @@ const[token,setToken]=useState("");
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState("");
 
-  // const API = "https://nodeapi-1-jguo.onrender.com";
-const API = "http://127.0.0.1:5000";
+  const API = "http://127.0.0.1:5000";
+
   useEffect(() => {
-    setToken(sessionStorage.getItem("token") || "");  
-    getData();
+    const t = sessionStorage.getItem("token") || "";
+    setToken(t);
+    getData(t);   // 🔥 token pass kiya
   }, []);
+  useEffect(() => {
+  const t = sessionStorage.getItem("token");
 
-  const getData = async () => {
-    const res = await fetch(`${API}/getdata`);
-    const data = await res.json();
-    setStudentList(data.data);
-  };
+  if (t) {
+    setToken(t);
+    getData(t);   // ✅ only when token exists
+  } else {
+    console.log("No token found");
+  }
+}, []);
 
-  // Open Add Form
+ const getData = async (tok) => {
+  const res = await fetch(`${API}/getdata`, {
+    headers: {
+      "Authorization": `Bearer ${tok}`
+    }
+  });
+
+  const data = await res.json();
+  setStudentList(Array.isArray(data.data) ? data.data : []);
+};
+
+   
+
   const addStudent = () => {
     setId("");
     setName("");
@@ -40,7 +58,6 @@ const API = "http://127.0.0.1:5000";
     setShow(true);
   };
 
-  // Open Edit Form
   const handleEdit = (item) => {
     setId(item.id);
     setName(item.name);
@@ -63,27 +80,36 @@ const API = "http://127.0.0.1:5000";
     if (isEdit) {
       await fetch(`${API}/updatedata/${id}`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`   // 🔥 TOKEN ADDED
+        },
         body: JSON.stringify(studentData)
       });
     } else {
       await fetch(`${API}/insertdata`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`   // 🔥 TOKEN ADDED
+        },
         body: JSON.stringify(studentData)
       });
     }
 
     setShow(false);
-    getData();
+    getData(token);
   };
 
   const deleteStudent = async (item) => {
-    let optionapi={
-      method: "DELETE"
-    }
-    await fetch(`${API}/deletedata/${item.id}`, );
-    getData();
+    await fetch(`${API}/deletedata/${item.id}`, {
+      method: "DELETE",
+      headers: {
+        "Authorization": `Bearer ${token}`   // 🔥 TOKEN ADDED
+      }
+    });
+
+    getData(token);
   };
 
   return (
@@ -106,36 +132,37 @@ const API = "http://127.0.0.1:5000";
             <th>Action</th>
           </tr>
         </thead>
+
         <tbody>
-          {studentList.map((item) => (
-            <tr key={item.id}>
-              <td>{item.id}</td>
-              <td>{item.name}</td>
-              <td>{item.course}</td>
-              <td>{item.email}</td>
-              <td>{item.status}</td>
-              <td>
-                <Button
-                  size="sm"
-                  variant="outline-primary"
-                  onClick={() => handleEdit(item)}
-                >
-                  Edit
-                </Button>{" "}
-                <Button
-                  size="sm"
-                  variant="outline-danger"
-                  onClick={() => deleteStudent(item)}
-                >
-                  Delete
-                </Button>
-              </td>
-            </tr>
-          ))}
+          {Array.isArray(studentList) &&
+            studentList.map((item) => (
+              <tr key={item.id}>
+                <td>{item.id}</td>
+                <td>{item.name}</td>
+                <td>{item.course}</td>
+                <td>{item.email}</td>
+                <td>{item.status}</td>
+                <td>
+                  <Button
+                    size="sm"
+                    variant="outline-primary"
+                    onClick={() => handleEdit(item)}
+                  >
+                    Edit
+                  </Button>{" "}
+                  <Button
+                    size="sm"
+                    variant="outline-danger"
+                    onClick={() => deleteStudent(item)}
+                  >
+                    Delete
+                  </Button>
+                </td>
+              </tr>
+            ))}
         </tbody>
       </Table>
 
-      {/* Modal */}
       <Modal show={show} onHide={() => setShow(false)} centered>
         <Modal.Header closeButton>
           <Modal.Title>

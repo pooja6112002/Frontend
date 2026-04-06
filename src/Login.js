@@ -7,12 +7,15 @@ import Card from 'react-bootstrap/Card';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import FooterB from "./FooterB";
+import { useNavigate } from "react-router-dom";
 
+  function Login() {
 
-function Login() {
-
+  const navigate = useNavigate();   
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+
+  
 
   const handleLogin = async (e) => {
     e.preventDefault(); 
@@ -31,12 +34,17 @@ function Login() {
 
       const data = await response.json();
 
-      if (data.success) {
-        sessionStorage.setItem("token", data.token);  
-        alert("Login Successful ");
-      } else {
-        alert("Invalid Credentials ");
-      }
+      
+if (data.success) {
+  sessionStorage.setItem("token", data.tokenval);
+
+  alert("Login Successful");
+
+  navigate("/student");   
+} else {
+  alert("Invalid Credentials");
+}
+      
 
     } catch (error) {
       console.error("Error:", error);
