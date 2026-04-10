@@ -17,7 +17,8 @@ function Table1() {
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState("");
 
-  const API = "http://127.0.0.1:5000";
+  // const API = "http://127.0.0.1:5000";
+  const API = "https://backendnode-1-61e8.onrender.com";
 
   // ✅ Only ONE useEffect
   useEffect(() => {
