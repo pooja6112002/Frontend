@@ -5,9 +5,11 @@ import Col from 'react-bootstrap/Col';
 import Card from 'react-bootstrap/Card';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
+import FooterB from "./FooterB";
 
 function Contact() {
   return (
+    <div>
     <Container >
       <Row >
         <Col >
@@ -63,8 +65,13 @@ function Contact() {
           </Card>
         </Col>
       </Row>
+     
 
     </Container>
+
+    <FooterB/>
+    </div>
+    
   );
 }
 

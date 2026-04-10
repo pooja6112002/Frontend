@@ -40,7 +40,7 @@ if (data.success) {
 
   alert("Login Successful");
 
-  navigate("/student");   
+ navigate("/dashboard/home");  
 } else {
   alert("Invalid Credentials");
 }

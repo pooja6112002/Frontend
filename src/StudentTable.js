@@ -10,7 +10,7 @@ function Table1() {
   const [isEdit, setIsEdit] = useState(false);
   const [token, setToken] = useState("");
 
-  // Separate States
+  // Form States
   const [id, setId] = useState("");
   const [name, setName] = useState("");
   const [course, setCourse] = useState("");
@@ -19,35 +19,36 @@ function Table1() {
 
   const API = "http://127.0.0.1:5000";
 
+  // ✅ Only ONE useEffect
   useEffect(() => {
-    const t = sessionStorage.getItem("token") || "";
-    setToken(t);
-    getData(t);   // 🔥 token pass kiya
-  }, []);
-  useEffect(() => {
-  const t = sessionStorage.getItem("token");
+    const t = sessionStorage.getItem("token");
 
-  if (t) {
-    setToken(t);
-    getData(t);   // ✅ only when token exists
-  } else {
-    console.log("No token found");
-  }
-}, []);
+    console.log("TOKEN:", t);
 
- const getData = async (tok) => {
-  const res = await fetch(`${API}/getdata`, {
-    headers: {
-      "Authorization": `Bearer ${tok}`
+    if (t) {
+      setToken(t);
+      getData(t);
+    } else {
+      console.log("No token found");
     }
-  });
+  }, []);
 
-  const data = await res.json();
-  setStudentList(Array.isArray(data.data) ? data.data : []);
-};
+  // ✅ GET DATA (correct token use)
+  const getData = async (tok) => {
+    if (!tok) return;
 
-   
+    const res = await fetch(`${API}/getdata`, {
+      method: "GET",
+      headers: {
+        Authorization: tok   // ✅ direct token
+      }
+    });
 
+    const data = await res.json();
+    setStudentList(Array.isArray(data.data) ? data.data : []);
+  };
+
+  // ADD
   const addStudent = () => {
     setId("");
     setName("");
@@ -58,6 +59,7 @@ function Table1() {
     setShow(true);
   };
 
+  // EDIT
   const handleEdit = (item) => {
     setId(item.id);
     setName(item.name);
@@ -68,6 +70,7 @@ function Table1() {
     setShow(true);
   };
 
+  // SAVE
   const saveStudent = async () => {
     const studentData = {
       id: parseInt(id),
@@ -82,7 +85,7 @@ function Table1() {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`   // 🔥 TOKEN ADDED
+          Authorization: token   // ✅ fixed
         },
         body: JSON.stringify(studentData)
       });
@@ -91,7 +94,7 @@ function Table1() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`   // 🔥 TOKEN ADDED
+          Authorization: token   // ✅ fixed
         },
         body: JSON.stringify(studentData)
       });
@@ -101,11 +104,12 @@ function Table1() {
     getData(token);
   };
 
+  // DELETE
   const deleteStudent = async (item) => {
     await fetch(`${API}/deletedata/${item.id}`, {
       method: "DELETE",
       headers: {
-        "Authorization": `Bearer ${token}`   // 🔥 TOKEN ADDED
+        Authorization: token   // ✅ fixed
       }
     });
 
@@ -113,7 +117,7 @@ function Table1() {
   };
 
   return (
-    <div className="container mt-4">
+   <div className="container-fluid mt-3 px-3">
       <div className="d-flex justify-content-between mb-3">
         <h3>Student Record</h3>
         <Button variant="success" onClick={addStudent}>
@@ -121,7 +125,8 @@ function Table1() {
         </Button>
       </div>
 
-      <Table bordered hover>
+      
+        <Table bordered hover className="w-100">
         <thead className="table-dark">
           <tr>
             <th>ID</th>
@@ -134,35 +139,35 @@ function Table1() {
         </thead>
 
         <tbody>
-          {Array.isArray(studentList) &&
-            studentList.map((item) => (
-              <tr key={item.id}>
-                <td>{item.id}</td>
-                <td>{item.name}</td>
-                <td>{item.course}</td>
-                <td>{item.email}</td>
-                <td>{item.status}</td>
-                <td>
-                  <Button
-                    size="sm"
-                    variant="outline-primary"
-                    onClick={() => handleEdit(item)}
-                  >
-                    Edit
-                  </Button>{" "}
-                  <Button
-                    size="sm"
-                    variant="outline-danger"
-                    onClick={() => deleteStudent(item)}
-                  >
-                    Delete
-                  </Button>
-                </td>
-              </tr>
-            ))}
+          {studentList.map((item) => (
+            <tr key={item.id}>
+              <td>{item.id}</td>
+              <td>{item.name}</td>
+              <td>{item.course}</td>
+              <td>{item.email}</td>
+              <td>{item.status}</td>
+              <td>
+                <Button
+                  size="sm"
+                  variant="outline-primary"
+                  onClick={() => handleEdit(item)}
+                >
+                  Edit
+                </Button>{" "}
+                <Button
+                  size="sm"
+                  variant="outline-danger"
+                  onClick={() => deleteStudent(item)}
+                >
+                  Delete
+                </Button>
+              </td>
+            </tr>
+          ))}
         </tbody>
       </Table>
 
+      {/* MODAL */}
       <Modal show={show} onHide={() => setShow(false)} centered>
         <Modal.Header closeButton>
           <Modal.Title>
@@ -237,3 +242,252 @@ function Table1() {
 }
 
 export default Table1;
+
+// import { useState, useEffect } from "react";
+// import Table from "react-bootstrap/Table";
+// import Button from "react-bootstrap/Button";
+// import Modal from "react-bootstrap/Modal";
+// import "bootstrap/dist/css/bootstrap.min.css";
+
+// function Table1() {
+//   const [show, setShow] = useState(false);
+//   const [studentList, setStudentList] = useState([]);
+//   const [isEdit, setIsEdit] = useState(false);
+//   const [token, setToken] = useState("");
+
+//   // Separate States
+//   const [id, setId] = useState("");
+//   const [name, setName] = useState("");
+//   const [course, setCourse] = useState("");
+//   const [email, setEmail] = useState("");
+//   const [status, setStatus] = useState("");
+
+//   const API = "http://127.0.0.1:5000";
+
+// useEffect(() => {
+//   const t = sessionStorage.getItem("token");
+
+//   console.log("TOKEN:", t);  // 🔥 debug
+
+//   if (t) {
+//     setToken(t);
+//     getData(t);   // ✅ correct
+//   } else {
+//     console.log("No token found");
+//   }
+// }, []);
+//   useEffect(() => {
+//   const t = sessionStorage.getItem("token");
+
+//   if (t) {
+//     setToken(t);
+//     getData(t);   // ✅ only when token exists
+//   } else {
+//     console.log("No token found");
+//   }
+// }, []);
+
+//  const getData = async (tok) => {
+//   const res = await fetch(`${API}/getdata`, {
+    
+//       headers: {
+//   Authorization: token  
+// }
+    
+//   });
+
+//   const data = await res.json();
+//   setStudentList(Array.isArray(data.data) ? data.data : []);
+// };
+
+   
+
+//   const addStudent = () => {
+//     setId("");
+//     setName("");
+//     setCourse("");
+//     setEmail("");
+//     setStatus("");
+//     setIsEdit(false);
+//     setShow(true);
+//   };
+
+//   const handleEdit = (item) => {
+//     setId(item.id);
+//     setName(item.name);
+//     setCourse(item.course);
+//     setEmail(item.email);
+//     setStatus(item.status);
+//     setIsEdit(true);
+//     setShow(true);
+//   };
+
+//   const saveStudent = async () => {
+//     const studentData = {
+//       id: parseInt(id),
+//       name,
+//       course,
+//       email,
+//       status
+//     };
+
+//     if (isEdit) {
+//       await fetch(`${API}/updatedata/${id}`, {
+//         method: "PUT",
+//         headers: {
+//           "Content-Type": "application/json",
+//           "Authorization": `Bearer ${token}`   // 🔥 TOKEN ADDED
+//         },
+//         body: JSON.stringify(studentData)
+//       });
+//     } else {
+//       await fetch(`${API}/insertdata`, {
+//         method: "POST",
+//         headers: {
+//           "Content-Type": "application/json",
+//           "Authorization": `Bearer ${token}`   // 🔥 TOKEN ADDED
+//         },
+//         body: JSON.stringify(studentData)
+//       });
+//     }
+
+//     setShow(false);
+//     getData(token);
+//   };
+
+//   const deleteStudent = async (item) => {
+//     await fetch(`${API}/deletedata/${item.id}`, {
+//       method: "DELETE",
+//       headers: {
+//         "Authorization": `Bearer ${token}`   // 🔥 TOKEN ADDED
+//       }
+//     });
+
+//     getData(token);
+//   };
+
+//   return (
+//     <div className="container mt-4">
+//       <div className="d-flex justify-content-between mb-3">
+//         <h3>Student Record</h3>
+//         <Button variant="success" onClick={addStudent}>
+//           Add Student
+//         </Button>
+//       </div>
+
+//       <Table bordered hover>
+//         <thead className="table-dark">
+//           <tr>
+//             <th>ID</th>
+//             <th>Name</th>
+//             <th>Course</th>
+//             <th>Email</th>
+//             <th>Status</th>
+//             <th>Action</th>
+//           </tr>
+//         </thead>
+
+//         <tbody>
+//           {Array.isArray(studentList) &&
+//             studentList.map((item) => (
+//               <tr key={item.id}>
+//                 <td>{item.id}</td>
+//                 <td>{item.name}</td>
+//                 <td>{item.course}</td>
+//                 <td>{item.email}</td>
+//                 <td>{item.status}</td>
+//                 <td>
+//                   <Button
+//                     size="sm"
+//                     variant="outline-primary"
+//                     onClick={() => handleEdit(item)}
+//                   >
+//                     Edit
+//                   </Button>{" "}
+//                   <Button
+//                     size="sm"
+//                     variant="outline-danger"
+//                     onClick={() => deleteStudent(item)}
+//                   >
+//                     Delete
+//                   </Button>
+//                 </td>
+//               </tr>
+//             ))}
+//         </tbody>
+//       </Table>
+
+//       <Modal show={show} onHide={() => setShow(false)} centered>
+//         <Modal.Header closeButton>
+//           <Modal.Title>
+//             {isEdit ? "Edit Student" : "Add Student"}
+//           </Modal.Title>
+//         </Modal.Header>
+
+//         <Modal.Body>
+//           <div className="mb-2">
+//             <label>ID</label>
+//             <input
+//               type="number"
+//               value={id}
+//               disabled={isEdit}
+//               onChange={(e) => setId(e.target.value)}
+//               className="form-control"
+//             />
+//           </div>
+
+//           <div className="mb-2">
+//             <label>Name</label>
+//             <input
+//               type="text"
+//               value={name}
+//               onChange={(e) => setName(e.target.value)}
+//               className="form-control"
+//             />
+//           </div>
+
+//           <div className="mb-2">
+//             <label>Course</label>
+//             <input
+//               type="text"
+//               value={course}
+//               onChange={(e) => setCourse(e.target.value)}
+//               className="form-control"
+//             />
+//           </div>
+
+//           <div className="mb-2">
+//             <label>Email</label>
+//             <input
+//               type="email"
+//               value={email}
+//               onChange={(e) => setEmail(e.target.value)}
+//               className="form-control"
+//             />
+//           </div>
+
+//           <div className="mb-2">
+//             <label>Status</label>
+//             <input
+//               type="text"
+//               value={status}
+//               onChange={(e) => setStatus(e.target.value)}
+//               className="form-control"
+//             />
+//           </div>
+//         </Modal.Body>
+
+//         <Modal.Footer>
+//           <Button variant="secondary" onClick={() => setShow(false)}>
+//             Cancel
+//           </Button>
+//           <Button variant="success" onClick={saveStudent}>
+//             Save
+//           </Button>
+//         </Modal.Footer>
+//       </Modal>
+//     </div>
+//   );
+// }
+
+// export default Table1;

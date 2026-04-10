@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import StudentTable from "./StudentTable";  
+import StudentTable from "./StudentTable";
 import HeaderB from "./HeaderB";
 import Home from "./Home";
 import Login from "./Login";
@@ -9,24 +9,15 @@ import "./Mystyle.css";
 import Studentnew from "./Studentnew";
 import Product from "./Product";
 import Teacher from "./Teacher";
+import Dashboard from "./Dashboard";
+import Course from "./Course";
+
+
 
 function App() {
-  const teacherName = [
-    {
-    
-    "name":"John Doe"},
-    {
-      "name":"Jane Smith",
-    },
-    {
-      "name":"Gagan",
-    }
-    ]; // Example teacher name
   return (
     <Router>
-      {/* <Teacher teachers={teacherName} /> */}
-      <HeaderB companyname="Softech Infoways"  />
-
+      <HeaderB companyname="Softech Infoways" />
 
       <main className="main">
         <Routes>
@@ -37,7 +28,17 @@ function App() {
           <Route path="/Login" element={<Login />} />
           <Route path="/Studentnew" element={<Studentnew />} />
           <Route path="/product" element={<Product />} />
-          <Route path="/student" element={<StudentTable />} />
+
+          
+          <Route path="/dashboard" element={<Dashboard />}>
+            <Route path="home" element={<h2>Welcome Dashboard</h2>} />
+            <Route path="student" element={<StudentTable />} />
+            <Route path="teacher" element={<Teacher />} />
+            <Route path="course" element={<Course />} />
+          </Route>
+        
+
+
         </Routes>
       </main>
     </Router>
